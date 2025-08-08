@@ -31,15 +31,18 @@ internal class TextProviderManager {
      * @return 按优先级排序后拼接的字符串
      */
     fun composeText(player: Player): String {
-        return providers.mapNotNull {
-            try {
-                it.provideText(player)
-            } catch (e: Exception) {
-                // 防止单个提供器异常影响整体
-                null
+        return providers
+            .mapNotNull {
+                try {
+                    it.provideText(player)
+                } catch (_: Exception) {
+                    // 防止单个提供器异常影响整体
+                    null
+                }
             }
-        }
+            // 过滤掉空文本的提供器
+            .filter { it.text.isNotBlank() }
             .sortedByDescending { it.priority }
-            .joinToString("   ") { it.text }
+            .joinToString("   ") { it.text }  // 使用空格分隔
     }
 }
